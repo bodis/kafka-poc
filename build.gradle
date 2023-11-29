@@ -1,0 +1,64 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.0'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'com.github.davidmc24.gradle.plugin.avro' version '1.9.1'
+}
+
+group = 'com.nitrowise'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '21'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'org.apache.avro:avro:1.11.3'
+
+//	implementation('org.apache.avro:avro-tools:1.11.3') {
+//		exclude group: 'org.slf4j', module: 'slf4j-reload4j'
+//	}
+//	implementation 'ch.qos.logback:logback-classic:1.2.3'
+
+	compileOnly 'org.projectlombok:lombok'
+	implementation 'org.liquibase:liquibase-core:4.25.0'
+
+	// developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	//developmentOnly 'org.springframework.boot:spring-boot-docker-compose'	(kezelheto fejlesztesnel indulo docker-compose megoldas)
+
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	annotationProcessor 'org.projectlombok:lombok'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+avro {
+	stringType = "String"
+	fieldVisibility = "private"
+}
+
+generateAvroJava {
+	source("${projectDir}/src/main/resources/avro")
+}

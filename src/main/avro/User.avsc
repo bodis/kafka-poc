@@ -1,0 +1,11 @@
+{
+  "namespace": "com.nitrowise.data.avro",
+  "type": "record",
+  "name": "UserMessage",
+  "fields": [
+     {"name": "id", "type": "int"},
+     {"name": "name", "type": "string"},
+     {"name": "favorite_number",  "type": ["int", "null"]},
+     {"name": "favorite_color", "type": ["string", "null"]}
+ ]
+}

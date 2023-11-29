@@ -1,0 +1,14 @@
+{
+  "namespace": "com.nitrowise.data.avro",
+  "type": "record",
+  "name": "OrderMessage",
+  "fields": [
+     {"name": "id", "type": "long"},
+     {"name": "user_id", "type": "long"},
+     {"name": "product_id", "type": "long"},
+     {"name": "product_name",  "type": ["string", "null"]},
+     {"name": "price", "type": "int"},
+     {"name": "count", "type": "int"},
+     {"name": "full_price",  "type": ["int", "null"]}
+ ]
+}
