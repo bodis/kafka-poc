@@ -1,8 +1,11 @@
 package com.nitrowise.kafkapoc.config;
 
 import com.nitrowise.data.avro.OrderMessage;
+import com.nitrowise.data.avro.UserMessage;
 import com.nitrowise.kafkapoc.utils.KafkaOrderDeserializer;
 import com.nitrowise.kafkapoc.utils.KafkaOrderSerializer;
+import com.nitrowise.kafkapoc.utils.KafkaUserDeserializer;
+import com.nitrowise.kafkapoc.utils.KafkaUserSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,5 +72,31 @@ public class KafkaConfig {
     public ConsumerFactory<Long, OrderMessage> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(orderKafkaConfig());
     }
+
+    @Bean
+    public Map<String, Object> userKafkaConfig() {
+        Map<String, Object> props = new HashMap<>(kafkaProperties.buildProducerProperties(null));
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaUserSerializer.class);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaUserDeserializer.class);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "teszt3");
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        return props;
+    }
+
+    @Bean
+    public ProducerFactory<Long, UserMessage> userProducerFactory() {
+        return new DefaultKafkaProducerFactory<>(userKafkaConfig());
+    }
+
+
+    @Bean
+    public KafkaTemplate<Long, UserMessage> userKafkaTemplate() {
+        KafkaTemplate<Long, UserMessage> kafkaTemplate = new KafkaTemplate<>(userProducerFactory());
+        kafkaTemplate.setDefaultTopic("UserTopic");
+        return kafkaTemplate;
+    }
+
 
 }

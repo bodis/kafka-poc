@@ -10,3 +10,13 @@ Content-Type: application/json
   "price": 234,
   "count": 3
 }
+
+### Generate 100 user to MySQL
+POST http://localhost:8080/user/generate/100
+
+### publish Users to Kafka Topic
+POST http://localhost:8080/user/publish
+
+### Generate Orders
+POST http://localhost:8080/orders/generate/200
+
