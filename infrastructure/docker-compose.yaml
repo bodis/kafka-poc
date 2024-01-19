@@ -79,6 +79,17 @@ services:
       - ./src:/opt/app/src
       - ./test:/opt/app/test
 
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    hostname: kafka-ui
+    container_name: kafka-ui
+    ports:
+      - 8080:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: true
+    depends_on:
+      - broker
+
 networks:
   default:
     external: true

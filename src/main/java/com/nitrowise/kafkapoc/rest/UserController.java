@@ -7,8 +7,14 @@ import com.nitrowise.kafkapoc.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 
-import java.util.List;
+import java.time.Duration;
+import java.util.Collections;
 
+import java.util.Properties;
+
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,4 +65,25 @@ public class UserController {
         });
     }
 
+    /**
+     * Manually walk-through the topic
+     */
+    public String searchUserInKafkaTopic() {
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "");
+        props.put("group.id", "your-group-id");
+        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+
+        try (Consumer<String, String> consumer = new KafkaConsumer<>(props)) {
+            consumer.subscribe(Collections.singletonList("TOPIC_NAME"));
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(10)); // Adjust duration as needed
+
+            for (var record : records) {
+                log.debug("record: {}", record);
+            }
+        }
+        return "Not Found"; // If no matching record is found
+    }
 }

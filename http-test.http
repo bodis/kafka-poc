@@ -1,6 +1,6 @@
 
 ###
-POST http://localhost:8080/orders
+POST http://localhost:8082/orders
 Content-Type: application/json
 
 {
@@ -12,11 +12,11 @@ Content-Type: application/json
 }
 
 ### Generate 100 user to MySQL
-POST http://localhost:8080/user/generate/100
+POST http://localhost:8082/user/generate/100
 
 ### publish Users to Kafka Topic
-POST http://localhost:8080/user/publish
+POST http://localhost:8082/user/publish
 
 ### Generate Orders
-POST http://localhost:8080/orders/generate/200
+POST http://localhost:8082/orders/generate/100
 

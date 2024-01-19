@@ -1,0 +1,86 @@
+{
+  "namespace": "com.sagemcom.avro.hes",
+  "type": "record",
+  "name": "MeterReadsReplyMessage",
+  "fields": [
+    {
+      "name": "header",
+      "type": {
+        "type": "record",
+        "name": "MeterReadsReplyMessageHeader",
+        "fields": [
+          {"name": "verb", "type": "string"},
+          {"name": "noun", "type": "string"},
+          {"name": "revision", "type": "int"},
+          {"name": "dateTime", "type": "string"},
+          {"name": "source", "type": "string"},
+          {"name": "messageID", "type": "string"}
+        ]
+      }
+    },
+
+    {
+      "name": "payload",
+      "type": {
+        "name": "MeterReadsReplyMessagePayload",
+        "type": "record",
+        "fields": [
+          {
+            "name": "MeterReading",
+            "type": {
+              "type": "array",
+              "items": {
+                "name": "MeterReading",
+                "type": "record",
+                "fields": [
+                  {
+                    "name": "Meter",
+                    "type": {
+                      "type": "record",
+                      "name": "Meter",
+                      "fields": [
+                        {"name": "mRID", "type": "string"},
+                        {"name": "idType", "type": "string"},
+                        {"name": "pathName", "type": "string"}
+                      ]
+                    }
+                  },
+                  {
+                    "name": "IntervalBlock",
+                    "type": {
+                      "type": "array",
+                      "items": {
+                        "name": "IntervalBlock",
+                        "type": "record",
+                        "fields": [
+                          {"name":"readingTypeId", "type": "string"},
+                          {
+                            "name":"iReadings",
+                            "type": {
+                              "type": "array",
+                              "items": {
+                                "name": "IReading",
+                                "type": "record",
+                                "fields": [
+                                  {"name": "endTime", "type": "string"},
+                                  {"name": "intervalLength", "type": "string"},
+                                  {"name": "value", "type": "string"},
+                                  {"name": "flags", "type": "string"},
+                                  {"name": "collectionTime", "type": "string"}
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+ ]
+}

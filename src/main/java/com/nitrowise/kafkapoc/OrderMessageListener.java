@@ -12,11 +12,23 @@ public class OrderMessageListener {
 
     @KafkaListener(
             // containerFactory = "kafkaListenerContainerFactory",
-            // id = "myListener",
+            id = "order-user-printer",
+            groupId = "order-user",
             topics = "RawOrderTopic",
             autoStartup = "${listen.auto.start:true}",
             concurrency = "${listen.concurrency:3}")
-    public void listen(OrderMessage order) {
+    public void listenAndPrintUser(OrderMessage order) {
+        log.info("order for user: {}", order.getUserId());
+    }
+
+    @KafkaListener(
+            // containerFactory = "kafkaListenerContainerFactory",
+            id = "printing",
+            groupId = "printing-group",
+            topics = "RawOrderTopic",
+            autoStartup = "${listen.auto.start:true}",
+            concurrency = "${listen.concurrency:1}")
+    public void printListener(OrderMessage order) {
         log.info("order message: {}", order);
     }
 }
