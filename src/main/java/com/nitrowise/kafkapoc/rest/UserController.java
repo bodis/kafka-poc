@@ -1,9 +1,9 @@
 package com.nitrowise.kafkapoc.rest;
 
 import com.nitrowise.data.avro.UserMessage;
-import com.nitrowise.kafkapoc.entity.UserEntity;
 import com.nitrowise.kafkapoc.model.UserDTO;
 import com.nitrowise.kafkapoc.repository.UserRepository;
+import com.nitrowise.kafkapoc.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 
@@ -16,6 +16,7 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,11 @@ public class UserController {
     private UserRepository userRepository;
 
     @Autowired
+    @Qualifier("userKafkaTemplate")
     private KafkaTemplate<Long, UserMessage> userKafkaTemplate;
+
+    @Autowired
+    private UserService userService;
 
     private Faker faker = new Faker();
 
@@ -47,14 +52,7 @@ public class UserController {
 
     @PostMapping("/generate/{count}")
     public void generateUsers(@PathVariable("count") int count) {
-        log.info("generate users > {}", count);
-        for (int i = 0; i < count; i++) {
-            UserEntity user = new UserEntity();
-            user.setName(faker.name().fullName());
-            user.setFavouriteColor(faker.color().name());
-            user.setFavouriteNumber(faker.number().numberBetween(1, 21));
-            userRepository.save(user);
-        }
+        userService.generateUsers(count);
     }
 
     @PostMapping("/publish")
@@ -63,6 +61,11 @@ public class UserController {
             UserMessage userMessage = new UserMessage((int) user.getId(), user.getName(), user.getFavouriteNumber(), user.getFavouriteColor());
             userKafkaTemplate.send(userKafkaTemplate.getDefaultTopic(), (long)userMessage.getId(), userMessage);
         });
+    }
+
+    @PostMapping("/update/{id}/{withTransaction}")
+    public void updateUser(@PathVariable(name = "id") long id, @PathVariable(name = "withTransaction") boolean withTransaction) {
+        userService.modifyUserAndSendEvent(id, withTransaction);
     }
 
     /**
