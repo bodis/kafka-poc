@@ -35,6 +35,13 @@ services:
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
 
+  activemq:
+    image: apache/activemq-classic:5.18.3
+    hostname: "0.0.0.0"
+    ports:
+      - 61616:61616
+      - 8161:8161
+
   schema-registry:
     image: confluentinc/cp-schema-registry:7.3.6
     hostname: schema-registry
@@ -47,37 +54,37 @@ services:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: broker:9092
 
-  ksqldb-server:
-    image: confluentinc/ksqldb-server:0.29.0
-    hostname: ksqldb-server
-    container_name: ksqldb-server
-    depends_on:
-      - broker
-      - schema-registry
-    ports:
-      - 8088:8088
-    environment:
-      KSQL_CONFIG_DIR: /etc/ksqldb
-      KSQL_LOG4J_OPTS: -Dlog4j.configuration=file:/etc/ksqldb/log4j.properties
-      KSQL_BOOTSTRAP_SERVERS: broker:9092
-      KSQL_HOST_NAME: ksqldb-server
-      KSQL_LISTENERS: http://0.0.0.0:8088
-      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
-      KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+#  ksqldb-server:
+#    image: confluentinc/ksqldb-server:0.29.0
+#    hostname: ksqldb-server
+#    container_name: ksqldb-server
+#    depends_on:
+#      - broker
+#      - schema-registry
+#    ports:
+#      - 8088:8088
+#    environment:
+#      KSQL_CONFIG_DIR: /etc/ksqldb
+#      KSQL_LOG4J_OPTS: -Dlog4j.configuration=file:/etc/ksqldb/log4j.properties
+#      KSQL_BOOTSTRAP_SERVERS: broker:9092
+#      KSQL_HOST_NAME: ksqldb-server
+#      KSQL_LISTENERS: http://0.0.0.0:8088
+#      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+#      KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
 
-  ksqldb-cli:
-    image: confluentinc/ksqldb-cli:0.29.0
-    container_name: ksqldb-cli
-    depends_on:
-      - broker
-      - ksqldb-server
-    entrypoint: /bin/sh
-    environment:
-      KSQL_CONFIG_DIR: /etc/ksqldb
-    tty: true
-    volumes:
-      - ./src:/opt/app/src
-      - ./test:/opt/app/test
+#  ksqldb-cli:
+#    image: confluentinc/ksqldb-cli:0.29.0
+#    container_name: ksqldb-cli
+#    depends_on:
+#      - broker
+#      - ksqldb-server
+#    entrypoint: /bin/sh
+#    environment:
+#      KSQL_CONFIG_DIR: /etc/ksqldb
+#    tty: true
+#    volumes:
+#      - ./src:/opt/app/src
+#      - ./test:/opt/app/test
 
   kafka-ui:
     image: provectuslabs/kafka-ui

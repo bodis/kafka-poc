@@ -6,8 +6,15 @@ import com.nitrowise.kafkapoc.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +34,14 @@ public class UserService {
     @Qualifier("transactionalUserKafkaTemplate")
     private KafkaTemplate<Long, UserMessage> transactionalUserKafkaTemplate;
 
+    @Autowired
+    @Qualifier("jmsTemplate")
+    private JmsTemplate jmsTemplate;
+
+    @Autowired
+    @Qualifier("nonTxableJmsTemplate")
+    private JmsTemplate nonTxableJmsTemplate;
+
     private Faker faker = new Faker();
 
     @Transactional
@@ -39,8 +54,10 @@ public class UserService {
 
         if (withTransactionalKafkaTemplate) {
             transactionalUserKafkaTemplate.send(userKafkaTemplate.getDefaultTopic(), (long) userMessage.getId(), userMessage);
+            jmsTemplate.send("TESZT_TX_QUEUE", session -> session.createTextMessage(user.getId() + " " + user.getName()));
         } else {
             userKafkaTemplate.send(userKafkaTemplate.getDefaultTopic(), (long) userMessage.getId(), userMessage);
+            nonTxableJmsTemplate.send("TESZT_WITHOUT_TX_QUEUE", session -> session.createTextMessage(user.getId() + " " + user.getName()));
         }
 
         if (id % 2 == 0) {
