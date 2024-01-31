@@ -18,5 +18,5 @@ POST http://localhost:8082/user/generate/100
 POST http://localhost:8082/user/publish
 
 ### Generate Orders
-POST http://localhost:8082/orders/generate/100
+POST http://localhost:8082/orders/generate/1
 

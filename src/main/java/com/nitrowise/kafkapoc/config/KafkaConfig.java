@@ -6,6 +6,7 @@ import com.nitrowise.kafkapoc.utils.KafkaOrderDeserializer;
 import com.nitrowise.kafkapoc.utils.KafkaOrderSerializer;
 import com.nitrowise.kafkapoc.utils.KafkaUserDeserializer;
 import com.nitrowise.kafkapoc.utils.KafkaUserSerializer;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,9 @@ import java.util.UUID;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.LongSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +34,15 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ConsumerRecordRecoverer;
+import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.support.ExponentialBackOffWithMaxRetries;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
 @EnableKafka
 @Configuration
+@Slf4j
 public class KafkaConfig {
 
     @Autowired
@@ -69,6 +76,15 @@ public class KafkaConfig {
     KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<Long, OrderMessage>> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<Long, OrderMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        // 3.x spring-kafka verziotol: factory.setRetryTemplate(retryTemplate());
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler(new ConsumerRecordRecoverer() {
+            @Override
+            public void accept(ConsumerRecord<?, ?> consumerRecord, Exception e) {
+                log.warn("MOST TORTENHETNE A DLQ MOZGATAS");
+            }
+        }, new ExponentialBackOffWithMaxRetries(4));
+
+        factory.setCommonErrorHandler(errorHandler);
         factory.setConcurrency(3);
         factory.getContainerProperties().setPollTimeout(3000);
         return factory;

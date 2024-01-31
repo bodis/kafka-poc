@@ -30,5 +30,6 @@ public class OrderMessageListener {
             concurrency = "${listen.concurrency:1}")
     public void printListener(OrderMessage order) {
         log.info("order message: {}", order);
+        throw new RuntimeException("POISON MESSAGE");
     }
 }
